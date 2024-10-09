@@ -12,6 +12,7 @@
         x-data="{
             step: 1,
             chosenPlan: 0,
+            chosenAddOns: [],
             isMonthly: true,
             nextStep: function() {
                 if (this.step < 4) {
@@ -35,6 +36,14 @@
                     this.chosenPlan = planIndex;
                 }
             },
+            chooseAddOns: function(addOnsIndex)
+            {
+                if (this.chosenAddOns.includes(addOnsIndex)) {
+                    this.chosenAddOns = this.chosenAddOns.filter(additional => additional != addOnsIndex);
+                } else {
+                    this.chosenAddOns.push(addOnsIndex);
+                }
+            },
             plans: [
                 {
                     name: 'Arcade',
@@ -54,7 +63,27 @@
                     yearlyPrice: '150',
                     iconColor: 'blue-300'
                 }
-            ]
+            ],
+            addOns: [
+                {
+                    name: 'Online service',
+                    description: 'Access to multiplayer games',
+                    monthlyPrice: 1,
+                    yearlyPrice: 10
+                },
+                {
+                    name: 'Larger storage',
+                    description: 'Extra 1TB of cloud save',
+                    monthlyPrice: 2,
+                    yearlyPrice: 20
+                },
+                {
+                    name: 'Customizable profile',
+                    description: 'Custom theme on your profile',
+                    monthlyPrice: 2,
+                    yearlyPrice: 20
+                }
+            ],
         }"
     >
         <div class="font-sans mx-auto pt-10 w-[400px] h-screen bg-blue-400 border border-black-50 flex flex-col">
@@ -101,7 +130,7 @@
                             <div @click="choosePlan(index+1)" :class="chosenPlan==index+1 ? 'bg-gray-50 border-blue-900' : ''" class="border border-gray-200 rounded-lg p-3 flex gap-4 cursor-pointer">
                                 <div :class="'bg-' + plan.iconColor" class="mt-1 w-8 h-8 rounded-full flex justify-center items-center text-white">X</div>
                                 <div class="">
-                                    <h3 class="text-gray-700 font-semibold" x-text="plan.name">Arcade</h3>
+                                    <h3 class="text-gray-700 font-semibold" x-text="plan.name"></h3>
                                     <p class="text-sm text-gray-400 font-medium" x-text="isMonthly ? '$' + plan.monthlyPrice + '/mo' : '$' + plan.yearlyPrice + '/yr'"></p>
                                     <p x-show="!isMonthly" class="text-sm text-blue-950">2 months free</p>
                                 </div>
@@ -116,12 +145,34 @@
                         <span :class="isMonthly ? 'text-gray-400' : 'text-blue-950'" class="text-sm font-medium">Yearly</span>
                     </div>
                 </div>
+
+                <!-- Step 3 -->
+                <div x-show="step==3" class="mt-8 px-5 py-8 bg-white rounded-md shadow-md">
+                    <div class="">
+                        <h1 class="text-xl font-semibold">Pick add-ons</h1>
+                        <p class="mt-2 text-gray-400">Add-ons help enhance your gaming experience.</p>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <template x-for="(additional, index) in addOns" :key="index">
+                            <div @click="chooseAddOns(index+1)" :class="chosenAddOns.includes(index+1) ? 'bg-gray-50 border-blue-900' : ''" class="border border-gray-200 rounded-lg p-3 cursor-pointer">
+                                <div class="w-full flex items-center gap-3">
+                                    <input type="checkbox" :checked="chosenAddOns.includes(index+1)" name="" id="">
+                                    <div class="flex-1">
+                                        <h3 class="text-gray-700 font-semibold" x-text="additional.name"></h3>
+                                        <p class="text-sm text-gray-400 font-medium" x-text="additional.description"></p>
+                                    </div>
+                                    <div class="text-sm text-blue-800" x-text="isMonthly ? '+$' + additional.monthlyPrice + '/mo' : '+$' + additional.yearlyPrice + '/yr'"></div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
-            <div class="w-full p-4 bg-white flex justify-between items-center">
+            <div class="w-full h-16 px-3 bg-white flex justify-between items-center">
                 <div class="">
                     <button x-show="step>1" @click="previousStep()" class="text-sm text-gray-500 font-medium">Go Back</button>
                 </div>
-                <div class="text-right">
+                <div x-show="step<4" class="text-right">
                     <button @click="nextStep()" class="p-3 rounded-md bg-blue-950 text-sm text-white font-medium">Next Step</button>
                 </div>
             </div>
